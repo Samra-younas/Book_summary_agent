@@ -39,12 +39,12 @@ Below is an example of the generated summary output:
 Watch a short demo of the system in action:
 https://github.com/user-attachments/assets/7586d56d-91ec-43d8-b7a4-2d7771b941ab
 
-▶️ [Watch Demo Video](Media/demo.mp4)
 
 ---
 
-Book: Start with No by Jim Camp
-
+## Sample Output
+## Book: Start with No by Jim Camp
+ 
 Super Summary:
 
 Negotiation requires a blend of strategy, emotional intelligence, and self-awareness. Recognizing the importance of clarity, control, and understanding in interactions can transform outcomes. A well-prepared negotiator remains focused on objectives, collaboration, and achieving success through thoughtful engagement and a calm demeanor.
