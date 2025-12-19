@@ -38,7 +38,7 @@ Below is an example of the generated summary output:
 
 Watch a short demo of the system in action:
 
-▶️ [Watch Demo Video](media/demo.mp4)
+▶️ [Watch Demo Video](Media/demo.mp4)
 
 ---
 
