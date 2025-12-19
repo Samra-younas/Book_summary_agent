@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book Summary Creator</title>
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 700px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+            display: none;
+        }
+        .google-doc-link {
+            background-color: #e8f5e9;
+            border: 2px solid #4caf50;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .google-doc-link a {
+            color: white;
+            background-color: #4caf50;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            display: inline-block;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .google-doc-link a:hover {
+            background-color: #45a049;
+        }
+        h3 {
+            color: #0056b3;
+            margin-top: 20px;
+        }
+        hr {
+            border: none;
+            border-top: 2px solid #ddd;
+            margin: 20px 0;
+        }
+        .time-info {
+            color: #666;
+            font-size: 0.9em;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <h1>📚 Book Summary Automation</h1>
+    
+    <input type="text" id="bookName" placeholder="Book Name">
+    <input type="text" id="author" placeholder="Author Name">
+    <textarea id="summary" placeholder="Paste Instaread Summary Here" rows="8"></textarea>
+    <button onclick="createSummary()">Create Summary</button>
+    
+    <div id="result"></div>
+
+    <script>
+        function createSummary() {
+            const bookName = document.getElementById('bookName').value;
+            const author = document.getElementById('author').value;
+            const summary = document.getElementById('summary').value;
+            
+            if (!bookName || !author || !summary) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<h2>⏳ Processing... Please wait (This may take 1-2 minutes)</h2>';
+            resultDiv.style.display = 'block';
+            
+            fetch('/create-summary', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    book_name: bookName,
+                    author: author,
+                    summary: summary
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    resultDiv.innerHTML = '<h2>❌ Error</h2><pre>' + data.error + '</pre>';
+                } else {
+                    let html = '<h2>✅ Summary Created: ' + data.book_name + '</h2><hr>';
+                    
+                    // GOOGLE DOC LINK AT TOP
+                    if (data.google_doc_url && !data.google_doc_url.includes('Error')) {
+                        html += '<div class="google-doc-link">';
+                        html += '<h3>✨ Google Doc Created and Formatted!</h3>';
+                        html += '<a href="' + data.google_doc_url + '" target="_blank">👉 Open Document in Google Docs</a>';
+                        html += '</div>';
+                    }
+                    
+                    // Time Info
+                    if (data.total_time) {
+                        html += '<p class="time-info">Total Processing Time: <strong>' + data.total_time + '</strong></p>';
+                    }
+                    
+                    html += '<hr>';
+                    
+                    // Abstract
+                    if (data.abstract) {
+                        html += '<h3>📋 Abstract</h3><p>' + data.abstract + '</p><hr>';
+                    }
+                    
+                    // Section Summaries
+                    if (data.main_content && data.main_content.length > 0) {
+                        html += '<h3>📖 Summary</h3>';
+                        data.main_content.forEach((section) => {
+                            html += '<div style="margin-bottom: 30px; border-left: 4px solid #007bff; padding-left: 15px;">' + 
+                                    section.content.replace(/\n/g, '<br>') + 
+                                    '</div>';
+                        });
+                        html += '<hr>';
+                    }
+                    
+                    // Key Points
+                    if (data.key_points) {
+                        html += '<h3>⭐ Key Takeaways</h3>' + data.key_points.replace(/\n/g, '<br>') + '<hr>';
+                    }
+                    
+                    // Writer Profile
+                    if (data.writer_profile) {
+                        html += '<h3>✍️ Writer Profile</h3><p>' + data.writer_profile + '</p><hr>';
+                    }
+                    
+                    // Quiz
+                   
+                    
+                    // Super Summary
+                    if (data.super_summary) {
+                        html += '<h3>💡 Super Summary</h3><p><strong>' + data.super_summary + '</strong></p>';
+                    }
+                    
+                    resultDiv.innerHTML = html;
+                }
+            })
+            .catch(error => {
+                resultDiv.innerHTML = '<h2>❌ Network Error</h2><p>Could not connect to server.</p><pre>' + error + '</pre>';
+            });
+        }
+    </script>
+
+</body>
+</html>
