@@ -37,6 +37,7 @@ Below is an example of the generated summary output:
 ## 🎥 Demo Video
 
 Watch a short demo of the system in action:
+https://github.com/user-attachments/assets/7586d56d-91ec-43d8-b7a4-2d7771b941ab
 
 ▶️ [Watch Demo Video](Media/demo.mp4)
 
@@ -70,6 +71,9 @@ Strong self-esteem helps you stay composed and confident in negotiations.
 
 🔗 **Full formatted summary (Google Docs):**  
 [https://docs.google.com/document/d/YOUR_DOCUMENT_ID](https://docs.google.com/document/d/1dLIgo69-sF3K2DPsm3tPx4yqDaOVeJBxX_B7h3dLFdg/edit?tab=t.0)
+
+
+
 
 ---
 
