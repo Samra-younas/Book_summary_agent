@@ -9,5 +9,7 @@ AI-powered Book Summary Agent built with Flask and OpenAI that generates structu
 - Prompt-engineered outputs
 
 ## 📸 Screenshots
+![Book Summary Output](screenshots/summary.png)
 
 ## 🎥 Demo Video
+[▶ Watch Demo Video](video/demo.mp4)
