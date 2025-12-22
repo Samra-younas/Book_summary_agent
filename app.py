@@ -190,19 +190,6 @@ def split_summary_into_sections(summary, section_count=10):
     
     return sections
 
-def authenticate_google():
-    creds = None
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
-            creds = flow.run_local_server(port=0)
-        with open("token.json", "w") as token:
-            token.write(creds.to_json())
-    return build("docs", "v1", credentials=creds)
 
 def add_text_with_style(req_list, idx, text, bold=False, blue=False, size=12, center=False, justify=False):
     """Helper to add formatted text with alignment options"""
