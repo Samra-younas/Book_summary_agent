@@ -17,7 +17,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 AI_MODEL = "gpt-4o-mini"  # or "gpt-4o" for better quality
 API_URL = "https://api.openai.com/v1/chat/completions"
 SCOPES = ["https://www.googleapis.com/auth/documents"]
-
+# forbidden words
 FORBIDDEN_WORDS = [
     'from the book lesson', 'In the first chapter', 'In this chapter',
     'key lesson', 'the book provides valuable', 'main point',
@@ -37,10 +37,13 @@ FORBIDDEN_PATTERNS = [
 ING_STARTS = ['understanding', 'exploring', 'examining', 'analyzing', 'discovering',
               'learning', 'finding', 'revealing', 'showing', 'demonstrating',
               'presenting', 'introducing', 'discussing', 'uncovering', 'breaking down']
+
+#Create Flask App route home page
 @app.route('/')
 def index():
     return render_template('index.html')
 
+# rouet for create sumamry  
 @app.route('/create-summary', methods=['POST'])
 def create_summary():
     start_time = time.time()
@@ -102,7 +105,7 @@ def create_summary():
         'google_doc_url': doc_url,
         'total_time': f'{total_minutes}m {total_seconds}s'
     })
-
+#Section division based on word  count on summary 
 def calculate_section_count(text):
     """Determine optimal section count between 10-13 based on content length"""
     word_count = len(text.split())
@@ -115,7 +118,7 @@ def calculate_section_count(text):
     else:
         return 13
 
-# CHANGED: Updated for OpenAI API format
+# Call Ai APi
 def make_ai_call(prompt):
     headers = {
         "Authorization": f"Bearer {OPENAI_API_KEY}",
@@ -136,7 +139,7 @@ def make_ai_call(prompt):
         return f"Request Error: {str(e)}"
     except Exception as e:
         return f"General Error: {str(e)}"
-
+# Remove  vague
 def clean_ai_response(text):
     """Remove common AI preambles and clean up response"""
     preambles = [
@@ -168,7 +171,7 @@ def remove_forbidden_words(text):
     
     return text.strip() 
 
-
+#spilt section based on topic  or paragraph
 def split_summary_into_sections(summary, section_count=10):
     """Split summary into optimal sections (10-13) without losing important info"""
     paragraphs = [p.strip() for p in summary.split('\n') if p.strip()]
@@ -190,7 +193,7 @@ def split_summary_into_sections(summary, section_count=10):
     
     return sections
 
-
+#add style for docs file
 def add_text_with_style(req_list, idx, text, bold=False, blue=False, size=12, center=False, justify=False):
     """Helper to add formatted text with alignment options"""
     # Remove markdown asterisks first
@@ -230,6 +233,7 @@ def add_text_with_style(req_list, idx, text, bold=False, blue=False, size=12, ce
     })
     
     return end_idx
+    # Create docs file
 def create_google_doc(book_name, author, data):
     try:
         service = authenticate_google()
@@ -283,7 +287,7 @@ def create_google_doc(book_name, author, data):
         error_msg = f"Google Doc Error: {str(e)}"
         print(f"❌ {error_msg}")
         return error_msg
-
+#sumamry section rules
 
 def create_section_summary(section_text, section_num, total_sections):
     """Create section summary with key points, examples, and clear formatting"""
@@ -291,7 +295,6 @@ def create_section_summary(section_text, section_num, total_sections):
 
 SECTION: {section_num}/{total_sections}
 
----
 
 1. HEADING (6-7 words, must be unique and specific):
    - Reflect the actual content of the section
@@ -324,7 +327,7 @@ SECTION: {section_num}/{total_sections}
     response = clean_ai_response(response)
     response = remove_forbidden_words(response)
     return response
-
+#super summary rules
 def create_super_summary(text):
     """Create exactly 43-word conclusion"""
     prompt = f"""Write a conclusion that is EXACTLY 43 words. Count each word carefully.
@@ -342,7 +345,7 @@ Text: {text}"""
     response = clean_ai_response(response)
     response = remove_forbidden_words(response)
     return response
-
+#abstract section prompt
 def create_abstract(text, book_name, author):
     """Create abstract (120 words max)"""
     prompt = f"""Write an abstract of 120 words or fewer.
@@ -364,6 +367,8 @@ Text: {text}"""
     response = clean_ai_response(response)
     response = remove_forbidden_words(response)
     return response
+
+#key points pormpt
 def create_key_points(text):
     """Create EXACTLY 7 one-liner bullet points"""
     prompt = f"""Create EXACTLY 7 bullet points. STRICT RULES:
@@ -404,7 +409,7 @@ Text: {text}"""
     # Return with proper line breaks
     response = '\n'.join(formatted_points)
     return response
-
+#writer prfiel prompt
 def create_writer_profile(author):
     """Create EXACTLY 50-word author profile"""
     prompt = f"""Write EXACTLY 50 words about {author}. STRICT RULES:
@@ -426,7 +431,7 @@ Author: {author}"""
     response = remove_forbidden_words(response) 
     return response
 
-
+#create story  rules
 def create_story(text):
     prompt = f"""Create a 250-word story from the summary given above that is interesting, has an element of humor, and keeps the same main message as the summary.
       The story must also have an emotional touch to make it more engaging. Include a concrete and memorable cue that ties directly to the moral so readers remember it easily.
@@ -434,7 +439,7 @@ def create_story(text):
          Make it engaging and relatable
         Never mention the author's name in the story.
         - NO "Here is..." or any introduction
-         Double check not more than 250 words.
+         Double-check not more than 250 words.
 Summary: {text}"""
     
     response = make_ai_call(prompt)
